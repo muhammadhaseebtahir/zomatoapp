@@ -25,7 +25,8 @@ export default function UserRegister() {
       const res = await axios.post("http://localhost:8000/auth/user/register", {
         userName,
         email,
-        password,
+        password
+        
       });
       setIsLoading(false)
          form.resetFields();
@@ -66,7 +67,7 @@ export default function UserRegister() {
               className=" flex-1"
             >
               <Input
-                prefix={<UserOutlined className="text-gray-400" />}
+                prefix={<UserOutlined className="text-gray-400 pr-3" />}
                 placeholder="First Name"
               />
             </Form.Item>
@@ -80,7 +81,7 @@ export default function UserRegister() {
               className="flex-1"
             >
               <Input
-                prefix={<UserOutlined className="text-gray-400" />}
+                prefix={<UserOutlined className="text-gray-400 pr-3" />}
                 placeholder="Last Name"
               />
             </Form.Item>
@@ -89,14 +90,14 @@ export default function UserRegister() {
           {/* Email */}
           <Form.Item
             name="email"
-            label={<span className="dark:text-gray-300">Email</span>}
+            label={<span className="dark:text-gray-300 ">Email</span>}
             rules={[
               { required: true, message: "Please enter your email" },
               { type: "email", message: "Enter a valid email" },
             ]}
           >
             <Input
-              prefix={<MailOutlined className="text-gray-400" />}
+              prefix={<MailOutlined className="text-gray-400 pr-3" />}
               placeholder="Email"
             />
           </Form.Item>
