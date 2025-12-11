@@ -17,7 +17,7 @@ export default function UserRegister() {
     let { firstName, lastName, email, password } = values;
     setIsLoading(true)
     if (!firstName || !lastName || !email || !password) {
-      return message.error("Please fill all the input.");
+      return message.info("Please fill all the input.");
     }
     let userName = firstName + lastName;
 
@@ -28,13 +28,15 @@ export default function UserRegister() {
         password
         
       });
-      setIsLoading(false)
+      message.success("Verifiy otp via send to your email.")
          form.resetFields();
       navigate("/auth/verify-otp");
     } catch (err) {
-      console.log(err);
-      message.error(err?.response?.data?.message || "Server error");
-       setIsLoading(false);
+      // console.log(err);
+      message.error(err?.response?.data?.message || "Something went wrong. Please try again.");
+      
+    }finally{
+      setIsLoading(false);
     }
   };
 
