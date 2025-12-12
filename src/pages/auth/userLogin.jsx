@@ -50,9 +50,9 @@ navigate("/")
           </p>
           <p className="dark:text-slate-300">
             Food partner:{" "}
-            <Link to="/auth/foodpartner-login" className="text-blue-800">
+            <Link to="/auth/foodpartner-register" className="text-blue-800 hover:underline">
               {" "}
-              Login{" "}
+              Register{" "}
             </Link>{" "}
           </p>
         </div>

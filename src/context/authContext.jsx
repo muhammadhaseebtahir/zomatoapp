@@ -6,9 +6,10 @@ import React, {
   useContext,
   createContext,
   useCallback,
-  useEffect
+  useEffect,
 } from "react";
 
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
 const Auth = createContext();
@@ -47,7 +48,6 @@ export default function AuthContextProvider({ children }) {
       setTimeout(() => {
         navigate("/");
       }, 500);
-      
     } catch (err) {
       console.log("Logout error", err);
       message.error("Something went wrong while logging out");
@@ -64,48 +64,83 @@ export default function AuthContextProvider({ children }) {
       });
       if (res.status === 200) {
         const userData = res.data.user;
-       if (!userData || !userData.role) {
-        console.log("User not found or role missing");
-        handleLogout();
-        return;
-      }
-        if (userData.role.includes("user") || userData.role.includes("admin") || userData.role.includes("superAdim")) {
-          dispatch({ type: "SET_LOGIN", payload: { user:userData, role: userData.role } });
+        if (!userData || !userData.role) {
+          console.log("User not found or role missing");
+          handleLogout();
+          return;
+        }
+        if (
+          userData.role.includes("user") ||
+          userData.role.includes("admin") ||
+          userData.role.includes("superAdim")
+        ) {
+          dispatch({
+            type: "SET_LOGIN",
+            payload: { user: userData, role: userData.role },
+          });
         }
       } else {
         handleLogout();
       }
     } catch (err) {
       console.log("Fetch user", err.response?.data?.error);
-    //   message.error(err.response?.data?.message || "Something went wrong.");
-      dispatch({type:"SET_LOGOUT"})
-      message.error("Session expired, please login again.")
+      //   message.error(err.response?.data?.message || "Something went wrong.");
+      dispatch({ type: "SET_LOGOUT" });
+      message.error("Session expired, please login again.");
       navigate("/auth/user-login");
-      localStorage.removeItem("token")  
-   
-    }finally{
-        setIsAppLoading(false)
+      localStorage.removeItem("token");
+    } finally {
+      setIsAppLoading(false);
     }
-  },[]);
+  }, []);
 
-
-  useEffect(()=>{
-    const fetchTokenAndFindUser= async()=>{
-const token = localStorage.getItem("token")
-if(token){
-
-  await   fetchUser()
-}else{
-    setIsAppLoading(false)
-}
+  const checkTokenExpiration = useCallback(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      if (decodedToken.exp < currentTime) {
+        message.error("Session expired, please log in again.");
+        handleLogout();
+      }
+    } catch (err) {
+      console.log("Token decode error:", err);
+      handleLogout();
     }
+  });
 
-fetchTokenAndFindUser()
-  },[])
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkTokenExpiration();
+    }, 5000);
+    const fetchTokenAndFindUser = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await fetchUser();
+      } else {
+        setIsAppLoading(false);
+      }
+    };
 
+    fetchTokenAndFindUser();
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
-    <Auth.Provider value={{...state,isAppLoading, setIsAppLoading,dispatch,fetchUser,handleLogout }}>
+    <Auth.Provider
+      value={{
+        ...state,
+        isAppLoading,
+        setIsAppLoading,
+        dispatch,
+        fetchUser,
+        handleLogout,
+      }}
+    >
       {children}
     </Auth.Provider>
   );

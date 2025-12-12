@@ -9,7 +9,7 @@ export default function AuthIndex() {
   return (
     <Routes>
       <Route path='/user-register'  element={<UserRegister/>} />
-    <Route path='/user-login' element={<UserLogin/>} />
+    <Route path='/login' element={<UserLogin/>} />
     <Route path='/verify-otp' element={<Verify_otp/>} />
     <Route path='/foodpartner-register' element={<FoodpartnerRegister/>} />
     <Route path='/foodpartner-login' element={<FoodpartnerLogin/>}  />
