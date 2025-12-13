@@ -110,6 +110,7 @@ export default function UserRegister() {
             label={<span className="dark:text-gray-300">Password</span>}
             rules={[
               { required: true, message: "Please enter your password" },
+               { min: 6, message: "Password must greater than 6 character." },
               {
                 pattern: /^(?=.*[!@#$%^&*(),.?":{}|<>])/,
                 message: "Password must contain at least one special character",

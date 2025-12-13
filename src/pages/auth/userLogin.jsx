@@ -67,12 +67,16 @@ navigate("/")
           >
             <Input
               placeholder="Email"
+               size="large"
               prefix={<MailOutlined className="text-gray-400 pr-3" />}
             />
           </Form.Item>
+          <div className="flex justify-between items-center mb-1">
+            <label className="text-gray-700 dark:text-white font-medium" >Password</label>
+          <Link to="/auth/forgot-password" className="text-blue-500  hover:underline" >Forgot Password</Link>
+          </div>
           <Form.Item
-            name="password"
-            label={<span className="dark:text-slate-300 pr-3 ">Password</span>}
+            name="password"            
             rules={[
               { required: true, message: "Please enter your Password." },
               {
@@ -81,17 +85,20 @@ navigate("/")
               },
             ]}
           >
+            
             <Input.Password
               placeholder="Password"
+              size="large"
               prefix={<LockOutlined className="text-gray-400" />}
             />
           </Form.Item>
           <Form.Item>
             <Button
+             size="large"
               loading={isLoading}
               type="primary"
               htmlType="submit"
-              className="w-full mt-3 font-semibold"
+              className="w-full mt-3 "
             >
               Login
             </Button>
