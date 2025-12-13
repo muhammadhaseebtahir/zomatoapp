@@ -82,7 +82,7 @@ export default function FoodpartnerRegister() {
             </Form.Item>
 
             {/* Brand + Phone */}
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-row  gap-x-4 ">
               <Form.Item
                 label={<span className="dark:text-gray-300">Brand Name</span>}
                 name="brandName"
