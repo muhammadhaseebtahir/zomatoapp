@@ -39,7 +39,7 @@ export default function AuthContextProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isAppLoading, setIsAppLoading] = useState(true);
   const navigate = useNavigate();
-
+ 
   const handleLogout = useCallback(() => {
     try {
       dispatch({ type: "SET_LOGOUT" });

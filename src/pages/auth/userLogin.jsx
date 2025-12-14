@@ -34,6 +34,7 @@ navigate("/")
       message.error(
         err.response?.data?.message || "Something went wrong. Please try again."
       );
+      console.log(err.response?.data?.error)
     } finally {
       setIsLoading(false);
     }

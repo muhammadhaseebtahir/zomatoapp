@@ -34,7 +34,7 @@ export default function UserRegister() {
     } catch (err) {
       // console.log(err);
       message.error(err?.response?.data?.message || "Something went wrong. Please try again.");
-      
+       console.log(err.response.data.error)
     }finally{
       setIsLoading(false);
     }
@@ -138,7 +138,7 @@ export default function UserRegister() {
         <p className="dark:text-white text-center  ">
           {" "}
           Already have an account?{" "}
-          <Link to="/auth/user-login" className="text-blue-600">
+          <Link to="/auth/login" className="text-blue-600">
             Login
           </Link>
         </p>

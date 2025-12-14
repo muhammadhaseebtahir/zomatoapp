@@ -3,9 +3,10 @@ import React from 'react'
 import { useAuthContext } from '../../../context/authContext'
 
 export default function Home() {
-  const {handleLogout,user,isAuthenticated} = useAuthContext()
+  const {handleLogout,user,isAuthenticated,role} = useAuthContext()
   console.log("User",user)
   console.log("isAuthenticated",isAuthenticated)
+  console.log("role",role)
   
   return (
     <div>

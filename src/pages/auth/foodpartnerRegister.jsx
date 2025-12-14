@@ -1,28 +1,60 @@
-import React from "react";
-import { Button, Form, Input } from "antd";
+import React, { useState } from "react";
+import { Button, Form, Input, message } from "antd";
 import registerLogo from "../../component/assets/image/registerImage.jpg";
-import { Link } from "react-router-dom";
-import {
-  UserOutlined,
-  MailOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { UserOutlined, MailOutlined, LockOutlined } from "@ant-design/icons";
 
 export default function FoodpartnerRegister() {
+  const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    const { userName, email, brandName, phoneNo, password } = values;
-    console.log(userName, email, brandName, phoneNo, password);
+   await handleSubmit(values)
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-sky-50 dark:bg-gray-900">
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl w-full bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
+  const handleSubmit=async(values)=>{
+      let { userName, email, brandName, phoneNo, password } = values;
+    userName = userName.trim().toLowerCase();
+    email = email.trim().toLowerCase();
+    brandName = brandName.trim().toLowerCase();
+    password = password.trim();
+    if (!userName || !email || !brandName || !phoneNo || !password) {
+      return message.warning("Please fill all the input.");
+    }
+    setIsLoading(true);
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/auth/food-partner/register",
+        {
+          userName,
+          email,
+          brandName,
+          phoneNo,
+          password,
+        }
+      );
 
+      if (res.status === 200) {
+        message.success("Verifiy otp via send to your email.");
+        form.resetFields();
+        navigate("/auth/verify-otp");
+        return;
+      }
+    } catch (err) {
+      message.error(err.response?.data?.message || "Something went wrong.");
+      console.log(err.response?.data?.error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen  flex items-center justify-center px-4 bg-sky-50 dark:bg-gray-900">
+      <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl w-full bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
         {/* Image Section */}
-       <div className="hidden md:block sticky top-0 h-screen">
+        <div className="hidden md:block sticky top-0 h-screen">
           <img
             src={registerLogo}
             alt="Register"
@@ -30,8 +62,8 @@ export default function FoodpartnerRegister() {
           />
         </div>
         {/* Form Section */}
-        <div className="w-full  px-6 sm:px-10 py-8">
-          <div className="text-center mb-6">
+        <div className="w-full px-5 sm:px-10 py-8">
+          <div className="text-center mb-3 md:mb-6">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Partner Sign Up
             </h1>
@@ -47,7 +79,6 @@ export default function FoodpartnerRegister() {
           </div>
 
           <Form layout="vertical" form={form} onFinish={onFinish}>
-            
             {/* Name */}
             <Form.Item
               label={<span className="dark:text-gray-300">Name</span>}
@@ -108,7 +139,11 @@ export default function FoodpartnerRegister() {
                 ]}
               >
                 <Input
-                 prefix={<span className="text-gray-900 dark:text-gray-300 pr-3 border-r-2 border-gray-700" >+92</span>}
+                  prefix={
+                    <span className="text-gray-900 dark:text-gray-300 pr-3 border-r-2 border-gray-700">
+                      +92
+                    </span>
+                  }
                   placeholder="3XXXXXXXXXX"
                 />
               </Form.Item>
@@ -134,6 +169,7 @@ export default function FoodpartnerRegister() {
             </Form.Item>
 
             <Button
+              loading={isLoading}
               type="primary"
               htmlType="submit"
               className="w-full text-lg font-semibold"
