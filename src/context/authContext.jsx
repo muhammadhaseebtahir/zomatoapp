@@ -79,15 +79,16 @@ export default function AuthContextProvider({ children }) {
             payload: { user: userData, role: userData.role },
           });
         }
+        // navigate("/blog")
       } else {
         handleLogout();
       }
     } catch (err) {
       console.log("Fetch user", err.response?.data?.error);
-      //   message.error(err.response?.data?.message || "Something went wrong.");
+        // console.log(err.response?.data?.message || "Something went wrong.");
       dispatch({ type: "SET_LOGOUT" });
       message.error("Session expired, please login again.");
-      navigate("/auth/user-login");
+      navigate("/auth/login");
       localStorage.removeItem("token");
     } finally {
       setIsAppLoading(false);

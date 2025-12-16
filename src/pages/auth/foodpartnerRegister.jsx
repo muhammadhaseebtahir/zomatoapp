@@ -37,6 +37,8 @@ export default function FoodpartnerRegister() {
       );
 
       if (res.status === 200) {
+         const email = res.data.email
+      localStorage.setItem("email",email)
         message.success("Verifiy otp via send to your email.");
         form.resetFields();
         navigate("/auth/verify-otp");
@@ -52,7 +54,7 @@ export default function FoodpartnerRegister() {
 
   return (
     <div className="min-h-screen  flex items-center justify-center px-4 bg-sky-50 dark:bg-gray-900">
-      <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl w-full bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl w-full bg-gray-200 dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
         {/* Image Section */}
         <div className="hidden md:block sticky top-0 h-screen">
           <img

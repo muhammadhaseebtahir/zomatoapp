@@ -28,13 +28,15 @@ export default function UserRegister() {
         password
         
       });
+      const useremail = res.data.email
+      localStorage.setItem("email",useremail)
       message.success("Verifiy otp via send to your email.")
          form.resetFields();
       navigate("/auth/verify-otp");
     } catch (err) {
-      // console.log(err);
-      message.error(err?.response?.data?.message || "Something went wrong. Please try again.");
-       console.log(err.response.data.error)
+      console.log(err);
+      message.error(err.response?.data?.message || "Something went wrong. Please try again.");
+       console.log(err.response?.data?.error)
     }finally{
       setIsLoading(false);
     }
@@ -42,7 +44,7 @@ export default function UserRegister() {
 
   return (
     <div className="flex items-center justify-center min-h-screen dark:bg-gray-900 bg-white">
-      <div className="w-full max-w-md bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-xl">
+      <div className="w-full max-w-md bg-gray-200 dark:bg-gray-800 p-6 rounded-lg shadow-xl">
         <div className="text-center mb-3">
           <h1 className="text-3xl mb-3 text-gray-800 font-bold  dark:text-white">
             Create your Account
@@ -138,7 +140,7 @@ export default function UserRegister() {
         <p className="dark:text-white text-center  ">
           {" "}
           Already have an account?{" "}
-          <Link to="/auth/login" className="text-blue-600">
+          <Link to="/auth/login" className="text-blue-600 hover:underline">
             Login
           </Link>
         </p>

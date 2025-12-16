@@ -3,32 +3,32 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import axios from "axios";
-import { useAuthContext } from "../../context/authContext";
 
-export default function UserLogin() {
+
+export default function Forgot_Password() {
   const navigate= useNavigate()
-  const {fetchUser}= useAuthContext()
+ 
   const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
   const onFinish = async (values) => {
     await handleSubmit(values);
   };
   const handleSubmit = async (values) => {
-    let { email, password } = values;
-    if (!email || !password) {
+    let { email, newPassword } = values;
+    if (!email || !newPassword) {
       return message.warning("Email and password are required");
     }
     setIsLoading(true);
     try {
-      const res = await axios.post("http://localhost:8000/auth/user/login", {
+      const res = await axios.put("http://localhost:8000/auth/user/forgot-password", {
         email,
-        password,
+        newPassword,
       });
-      const { token } = res.data;
-      localStorage.setItem("token", token);
-      await fetchUser()
-      message.success("Login successfully.");
-navigate("/")
+      if(res.status === 201){
+        message.success(res.data.message || "Password update successfully.");
+
+        navigate("/auth/login")
+      }
     } catch (err) {
       // console.log(`err :${err}`);
       message.error(
@@ -44,18 +44,9 @@ navigate("/")
       <div className="w-full max-w-md dark:bg-gray-800 bg-gray-200 p-6 rounded-xl  border-gray-100 shadow-xl dark:shadow-sm dark:shadow-gray-700   ">
         <div className="text-center mb-3">
           <h1 className="text-gray-900 font-bold mb-3 dark:text-white text-3xl">
-            Welcome back.
+            Forgot Password
           </h1>
-          <p className="dark:text-slate-300 ">
-            Sign in to continue your food journey.
-          </p>
-          <p className="dark:text-slate-300">
-            Food partner:{" "}
-            <Link to="/auth/foodpartner-register" className="text-blue-800 hover:underline">
-              {" "}
-              Register{" "}
-            </Link>{" "}
-          </p>
+        
         </div>
         <Form layout="vertical" onFinish={onFinish} form={form}>
           <Form.Item
@@ -73,11 +64,10 @@ navigate("/")
             />
           </Form.Item>
           <div className="flex justify-between items-center mb-1">
-            <label className="text-gray-700 dark:text-white font-medium" >Password</label>
-          <Link to="/auth/forgot-password" className="text-blue-500  hover:underline" >Forgot Password</Link>
+            <label className="text-gray-700 dark:text-white font-medium" >New Password</label>
           </div>
           <Form.Item
-            name="password"            
+            name="newPassword"            
             rules={[
               { required: true, message: "Please enter your Password." },
               {
@@ -88,7 +78,7 @@ navigate("/")
           >
             
             <Input.Password
-              placeholder="Password"
+              placeholder="Enter new Password"
               size="large"
               prefix={<LockOutlined className="text-gray-400" />}
             />
@@ -101,7 +91,7 @@ navigate("/")
               htmlType="submit"
               className="w-full mt-3 "
             >
-              Login
+              Forgot Password
             </Button>
           </Form.Item>
         </Form>
