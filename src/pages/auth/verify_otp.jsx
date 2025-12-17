@@ -64,7 +64,7 @@ export default function Verify_otp() {
     }
   };
   return (
-    <div className="w-full min-h-screen px-3 flex items-center justify-center bg-slate-50 dark:bg-gray-900">
+    <div className="w-full min-h-screen px-3 flex items-center justify-center bg-slate-50 dark:bg-gray-950">
       <div className="w-full max-w-md rounded-lg shadow-xl bg-gray-100 dark:bg-gray-700 p-6">
         <h1 className="mb-4 text-center text-3xl text-gray-900 dark:text-white font-bold">
           OTP Verification
