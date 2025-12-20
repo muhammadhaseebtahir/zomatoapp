@@ -41,7 +41,7 @@ navigate("/")
   };
   return (
     <div className="min-h-screen flex justify-center items-center bg-white dark:bg-gray-900 ">
-      <div className="w-full max-w-md dark:bg-gray-800 bg-gray-200 p-6 rounded-xl  border-gray-100 shadow-xl dark:shadow-sm dark:shadow-gray-700   ">
+      <div className="w-full max-w-md dark:bg-gray-800 bg-slate-100 p-6 rounded-xl  border-gray-100 shadow-2xl dark:shadow-sm dark:shadow-gray-700   ">
         <div className="text-center mb-3">
           <h1 className="text-gray-900 font-bold mb-3 dark:text-white text-3xl">
             Welcome back.

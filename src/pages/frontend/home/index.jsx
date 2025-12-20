@@ -33,6 +33,10 @@ export default function InstagramHome() {
       setLoadingPosts(false);
     }, 1500);
   }, []);
+
+ 
+
+
  useEffect(() => {
     const handleScroll = () => {
       if (!feedRef.current) return; // ✅ Null guard
