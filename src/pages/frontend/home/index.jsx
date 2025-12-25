@@ -1,28 +1,33 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  Heart, Home, MessageCircle, PlusSquare,
-  Search, Compass, Bookmark, MoreHorizontal
+  Heart,
+  Home,
+  MessageCircle,
+  PlusSquare,
+  Search,
+  Compass,
+  Bookmark,
+  MoreHorizontal,
 } from "lucide-react";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+import { Skeleton } from "antd";
+import PostCreated from "../postCreated";
 
-export default function InstagramHome() {
+export default function InstagraeHome() {
+  const [post, setPost] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
-  const [posts, setPosts] = useState([]);
   const feedRef = useRef(null);
-
-  // Dummy stories
-  const stories = [...Array(8)].map((_, i) => ({
-    id: i + 1,
-    src: `https://i.pravatar.cc/150?img=${i + 10}`,
-    username: `user${i + 1}`,
-  }));
+  const [like, setLike] = useState(false);
+  const [showCreatePost, setShowCreatePost] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
-      setPosts([
+      setPost([
         { id: 1, type: "image", src: "https://picsum.photos/600/600?1" },
-        { id: 2, type: "video", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
+        {
+          id: 2,
+          type: "video",
+          src: "https://www.w3schools.com/html/mov_bbb.mp4",
+        },
         { id: 3, type: "image", src: "https://picsum.photos/600/600?3" },
         { id: 4, type: "image", src: "https://picsum.photos/600/600?4" },
         { id: 5, type: "image", src: "https://picsum.photos/600/600?5" },
@@ -31,39 +36,37 @@ export default function InstagramHome() {
         { id: 8, type: "image", src: "https://picsum.photos/600/600?8" },
       ]);
       setLoadingPosts(false);
-    }, 1500);
+    }, 3000);
   }, []);
 
- 
+  const SkeletonBox = ({ className }) => (
+    <div
+      className={`bg-gray-100 dark:bg-gray-800 animate-pulse rounded ${className}`}
+    ></div>
+  );
 
+  const stories = [...Array(15)].map((_, i) => ({
+    id: i + 1,
+    src: `https://i.pravatar.cc/150?img=${i + 20}`,
+    username: `user${i + 1}`,
+  }));
 
- useEffect(() => {
-    const handleScroll = () => {
-      if (!feedRef.current) return; // ✅ Null guard
-      const videos = feedRef.current.querySelectorAll("video");
-      videos.forEach((video) => {
-        const rect = video.getBoundingClientRect();
-        if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-          video.play();
-        } else {
-          video.pause();
-        }
-      });
-    };
-    document.addEventListener("scroll", handleScroll, true);
-    return () => document.removeEventListener("scroll", handleScroll, true);
-  }, []);
   return (
-    <div className="dark:bg-black dark:text-white min-h-screen flex flex-row">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="dark:bg-[rgb(15,15,15)] dark:text-gray-200 min-h-screen w-full flex flex-row">
+      {/* ********Side bar************ */}
+      <Sidebar setShowCreatePost={setShowCreatePost} />
 
-      {/* Main Feed */}
-      <main ref={feedRef} className="flex-1 max-w-xl mx-auto relative overflow-y-auto" >
-        {/* Stories */}
-        <div className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-2 sticky top-0 bg-black z-10 border-b border-gray-800" style={{scrollbarWidth: "none"}}>
+      <main
+        ref={feedRef}
+        className="flex-1 max-w-xl mx-auto relative overflow-y-auto overflow-x-hidden"
+      >
+        {/* **************Stories********* */}
+        <div
+          className="flex gap-4 overflow-x-auto py-4 px-2 sticky top-0 z-10 border-b border-gray-400"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           {stories.map((story) => (
-            <div key={story.id} className="flex flex-col items-center ">
+            <div key={story.id} className="flex flex-col items-center">
               <div className="w-16 h-16 rounded-full border-2 border-pink-500">
                 <img
                   src={story.src}
@@ -71,167 +74,223 @@ export default function InstagramHome() {
                   alt={story.username}
                 />
               </div>
-              <span className="text-xs mt-1">{story.username}</span>
+              <span className="text-sm mb-1">{story.username}</span>
             </div>
           ))}
         </div>
 
-        {/* Posts */}
+        {/* ***********Post********* */}
         <div className="mt-4">
-          {posts.map((post) => (
-            <div key={post.id} className="border border-gray-800 rounded-md mb-6">
-              {/* Post Header */}
-              <div className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={`https://i.pravatar.cc/40?img=${post.id + 20}`}
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <span className="font-semibold text-sm">john_doe</span>
+          {loadingPosts ? (
+            <div className="space-y-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-center p-3">
+                    <div className="flex items-center gap-3">
+                      <SkeletonBox className="w-8 h-8 rounded-full" />
+                      <SkeletonBox className="w-12 h-4 rounded-2xl" />
+                    </div>
+                    <MoreHorizontal />
+                  </div>
+                  <SkeletonBox className="w-full h-80" />
                 </div>
-                <MoreHorizontal />
-              </div>
-
-              {/* Post Media */}
-              {loadingPosts ? (
-                <Skeleton className="w-full h-80" />
-              ) : post.type === "image" ? (
-                <img src={post.src} className="w-full object-cover" alt="post" />
-              ) : (
-                <video
-                  className="w-full aspect-video"
-                  src={post.src}
-                  controls
-                  autoPlay
-                  muted
-                  loop
-                />
-              )}
-
-              {/* Actions */}
-              <div className="flex justify-between px-4 py-3">
-                <div className="flex gap-4">
-                  <Heart className="hover:text-red-500 cursor-pointer" />
-                  <MessageCircle className="cursor-pointer" />
-                </div>
-                <Bookmark className="cursor-pointer" />
-              </div>
-
-              {/* Likes & Caption */}
-              <p className="px-4 font-semibold text-sm">12,345 likes</p>
-              <p className="px-4 text-sm mt-1">
-                <span className="font-semibold mr-1">john_doe</span>
-                Enjoying the vibes 🌅
-              </p>
-
-              {/* Comment Input */}
-              <div className="border-t border-gray-800 mt-3 p-3">
-                <input
-                  placeholder="Add a comment..."
-                  className="w-full bg-transparent outline-none text-sm"
-                />
-              </div>
+              ))}
             </div>
-          ))}
+          ) : (
+            post.map((post) => (
+              <div
+                key={post.id}
+                className="border border-gray-300 dark:border-gray-800 rounded-md mb-6"
+              >
+                {/* Post Header */}
+                <div className="flex items-center justify-between p-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={`https://i.pravatar.cc/40?img=${post.id + 20}`}
+                      className="w-8 h-8 rounded-full"
+                      alt="user"
+                    />
+                    <span className="font-bold text-sm text-gray-950 dark:text-white">
+                      john_doe
+                    </span>
+                  </div>
+                  <MoreHorizontal className="cursor-pointer" />
+                </div>
+
+                {/* Post Media */}
+                {post.type === "image" ? (
+                  <img
+                    src={post.src}
+                    className="w-full object-cover"
+                    alt="post"
+                  />
+                ) : (
+                  <video
+                    className="w-full aspect-video"
+                    src={post.src}
+                    controls
+                    muted
+                    loop
+                  />
+                )}
+
+                {/* **************Action******* */}
+                <div className="flex justify-between px-4 py-3">
+                  <div className="flex gap-3">
+                    <Heart
+                      onClick={() => setLike(!like)}
+                      className={`cursor-pointer transition ${
+                        like ? "text-red-500" : "text-gray-700"
+                      }`}
+                      fill={like ? "red" : "none"}
+                    />
+                    <MessageCircle className="cursor-pointer text-gray-700" />
+                  </div>
+                  <Bookmark className="cursor-pointer" />
+                </div>
+
+                <p className="text-sm px-4 font-semibold">12,345 likes</p>
+                <p className="px-4 text-sm mt-1">
+                  <span className="font-semibold mr-1">john_doe</span>
+                  Enjoying the vibes 🌅
+                </p>
+
+                {/* Comment Input */}
+                <div className="border-t border-gray-800 mt-3 p-3">
+                  <input
+                    placeholder="Add a comment..."
+                    className="w-full bg-transparent outline-none text-sm"
+                  />
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </main>
 
-      {/* Right Sidebar */}
       <RightSidebar />
+      <BottomNavbar setShowCreatePost={setShowCreatePost} />
 
-      {/* Bottom Navbar */}
-      <BottomNavbar />
+      {/* Modal */}
+      {showCreatePost && (
+        <PostCreated onClose={() => setShowCreatePost(false)} />
+      )}
     </div>
   );
 }
 
-/* Sidebar */
-function Sidebar() {
+function Sidebar({ setShowCreatePost }) {
   const menuItems = [
-    { icon: <Home />, text: "Home" },
-    { icon: <Search />, text: "Search" },
-    { icon: <Compass />, text: "Explore" },
-    { icon: <MessageCircle />, text: "Messages" },
-    { icon: <Heart />, text: "Notifications" },
-    { icon: <PlusSquare />, text: "Create" },
+    { icon: <Home />, text: "Home", onClick: () => console.log("Home") },
+    { icon: <Search />, text: "Search", onClick: () => console.log("Search") },
+    { icon: <Compass />, text: "Explore", onClick: () => console.log("Explore") },
+    { icon: <MessageCircle />, text: "Messages", onClick: () => console.log("Messages") },
+    { icon: <Heart />, text: "Notifications", onClick: () => console.log("Notifications") },
+    { 
+      icon: <PlusSquare />, 
+      text: "Create", 
+      onClick: () => setShowCreatePost(true)
+    },
   ];
 
   return (
-    <aside className="hidden md:flex flex-col p-4 lg:w-64 md:w-20 border-r border-gray-800 sticky top-0 h-screen">
-      <h1 className="text-2xl font-bold mb-8">Instagram</h1>
-      <nav className="flex flex-col gap-3">
-        {menuItems.map((item, idx) => (
-          <SidebarItem key={idx} icon={item.icon} text={item.text} />
+    <div className="hidden md:flex flex-col p-4 lg:w-64 md:w-20 border-r border-gray-500 sticky top-0 h-screen">
+      <h1 className="hidden md:flex text-md pl-0 lg:pl-3 lg:text-3xl font-bold mb-8">
+        Zomato
+      </h1>
+
+      <div className="flex flex-col gap-3">
+        {menuItems.map((item, i) => (
+          <SidebarItem 
+            icon={item.icon} 
+            text={item.text} 
+            onClick={item.onClick} 
+            key={i} 
+          />
         ))}
-        {/* Profile */}
         <SidebarItem
           icon={
             <img
               src="https://i.pravatar.cc/40"
               className="w-6 h-6 rounded-full"
+              alt="Profile"
             />
           }
           text="Profile"
+          onClick={() => console.log("Profile")}
         />
-      </nav>
-    </aside>
+      </div>
+    </div>
   );
 }
 
-function SidebarItem({ icon, text }) {
+function SidebarItem({ icon, text, onClick }) {
   return (
-    <div className="flex items-center gap-4 p-2 rounded-md cursor-pointer hover:bg-gray-900">
+    <div 
+      className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
+      onClick={onClick}
+    >
       {icon}
       <span className="hidden lg:inline">{text}</span>
     </div>
   );
 }
 
-/* Right Sidebar */
 function RightSidebar() {
   return (
-    <aside className="hidden lg:flex flex-col w-80 p-4 sticky top-0 h-screen">
-      {/* Profile */}
-      <div className="flex items-center gap-4 mb-6">
+    <div className="hidden lg:flex flex-col w-80 p-4 sticky top-0 h-screen">
+      {/* ******Profile ****** */}
+      <div className="flex items-center gap-3">
         <img
           src="https://i.pravatar.cc/50"
+          alt="user"
           className="w-12 h-12 rounded-full"
         />
         <div>
           <p className="font-semibold">your_username</p>
-          <p className="text-gray-400 text-sm">Your Name</p>
+          <p className="dark:text-gray-300 text-sm">Your Name</p>
         </div>
       </div>
 
-      {/* Suggestions */}
-      <p className="text-gray-400 text-sm mb-4">Suggestions for you</p>
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="flex justify-between items-center mb-3">
+      <p className="text-sm mt-6 text-gray-700 dark:text-gray-400">
+        Suggestions for you
+      </p>
+
+      {[1, 2, 3, 4, 5].map((s) => (
+        <div key={s} className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-3">
             <img
-              src={`https://i.pravatar.cc/40?img=${i + 30}`}
+              src={`https://i.pravatar.cc/40?img=${s + 10}`}
+              alt="suggestion"
               className="w-8 h-8 rounded-full"
             />
-            <p className="text-sm font-semibold">suggested_{i}</p>
+            <div>
+              <p className="font-semibold text-sm">suggested_user{s}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Followed by user1, user2
+              </p>
+            </div>
           </div>
           <button className="text-blue-500 text-sm font-semibold">
             Follow
           </button>
         </div>
       ))}
-    </aside>
+    </div>
   );
 }
 
-/* Bottom Navbar */
-function BottomNavbar() {
+function BottomNavbar({ setShowCreatePost }) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 flex justify-around p-2 md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 p-2 bg-white dark:bg-gray-700 text-black dark:text-gray-300 border-t border-gray-300 flex justify-around md:hidden">
       <Home className="cursor-pointer" />
       <Search className="cursor-pointer" />
-      <PlusSquare className="cursor-pointer" />
+      <PlusSquare 
+        className="cursor-pointer" 
+        onClick={() => setShowCreatePost(true)}
+      />
       <Heart className="cursor-pointer" />
       <MessageCircle className="cursor-pointer" />
-    </nav>
+    </div>
   );
 }
