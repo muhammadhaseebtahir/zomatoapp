@@ -8,36 +8,27 @@ import {
   Compass,
   Bookmark,
   MoreHorizontal,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
 } from "lucide-react";
 import { Skeleton } from "antd";
 import PostCreated from "../postCreated";
+import { useDataContext } from "../../../context/getFoodContext";
 
 export default function InstagraeHome() {
+  const { data } = useDataContext();
   const [post, setPost] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const feedRef = useRef(null);
-  const [like, setLike] = useState(false);
   const [showCreatePost, setShowCreatePost] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setPost([
-        { id: 1, type: "image", src: "https://picsum.photos/600/600?1" },
-        {
-          id: 2,
-          type: "video",
-          src: "https://www.w3schools.com/html/mov_bbb.mp4",
-        },
-        { id: 3, type: "image", src: "https://picsum.photos/600/600?3" },
-        { id: 4, type: "image", src: "https://picsum.photos/600/600?4" },
-        { id: 5, type: "image", src: "https://picsum.photos/600/600?5" },
-        { id: 6, type: "image", src: "https://picsum.photos/600/600?6" },
-        { id: 7, type: "image", src: "https://picsum.photos/600/600?7" },
-        { id: 8, type: "image", src: "https://picsum.photos/600/600?8" },
-      ]);
+    if (data && data.length > 0) {
       setLoadingPosts(false);
-    }, 3000);
-  }, []);
+    }
+  }, [data]);
 
   const SkeletonBox = ({ className }) => (
     <div
@@ -53,7 +44,6 @@ export default function InstagraeHome() {
 
   return (
     <div className="dark:bg-[rgb(15,15,15)] dark:text-gray-200 min-h-screen w-full flex flex-row">
-      {/* ********Side bar************ */}
       <Sidebar setShowCreatePost={setShowCreatePost} />
 
       <main
@@ -62,7 +52,7 @@ export default function InstagraeHome() {
       >
         {/* **************Stories********* */}
         <div
-          className="flex gap-4 overflow-x-auto py-4 px-2 sticky top-0 z-10 border-b border-gray-400"
+          className="flex gap-4 overflow-x-auto py-4 px-2 sticky top-0 z-10 border-b border-gray-400 bg-white dark:bg-[rgb(15,15,15)]"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {stories.map((story) => (
@@ -97,72 +87,8 @@ export default function InstagraeHome() {
               ))}
             </div>
           ) : (
-            post.map((post) => (
-              <div
-                key={post.id}
-                className="border border-gray-300 dark:border-gray-800 rounded-md mb-6"
-              >
-                {/* Post Header */}
-                <div className="flex items-center justify-between p-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={`https://i.pravatar.cc/40?img=${post.id + 20}`}
-                      className="w-8 h-8 rounded-full"
-                      alt="user"
-                    />
-                    <span className="font-bold text-sm text-gray-950 dark:text-white">
-                      john_doe
-                    </span>
-                  </div>
-                  <MoreHorizontal className="cursor-pointer" />
-                </div>
-
-                {/* Post Media */}
-                {post.type === "image" ? (
-                  <img
-                    src={post.src}
-                    className="w-full object-cover"
-                    alt="post"
-                  />
-                ) : (
-                  <video
-                    className="w-full aspect-video"
-                    src={post.src}
-                    controls
-                    muted
-                    loop
-                  />
-                )}
-
-                {/* **************Action******* */}
-                <div className="flex justify-between px-4 py-3">
-                  <div className="flex gap-3">
-                    <Heart
-                      onClick={() => setLike(!like)}
-                      className={`cursor-pointer transition ${
-                        like ? "text-red-500" : "text-gray-700"
-                      }`}
-                      fill={like ? "red" : "none"}
-                    />
-                    <MessageCircle className="cursor-pointer text-gray-700" />
-                  </div>
-                  <Bookmark className="cursor-pointer" />
-                </div>
-
-                <p className="text-sm px-4 font-semibold">12,345 likes</p>
-                <p className="px-4 text-sm mt-1">
-                  <span className="font-semibold mr-1">john_doe</span>
-                  Enjoying the vibes 🌅
-                </p>
-
-                {/* Comment Input */}
-                <div className="border-t border-gray-800 mt-3 p-3">
-                  <input
-                    placeholder="Add a comment..."
-                    className="w-full bg-transparent outline-none text-sm"
-                  />
-                </div>
-              </div>
+            data.map((post) => (
+              <PostCard key={post._id} post={post} />
             ))
           )}
         </div>
@@ -171,10 +97,215 @@ export default function InstagraeHome() {
       <RightSidebar />
       <BottomNavbar setShowCreatePost={setShowCreatePost} />
 
-      {/* Modal */}
       {showCreatePost && (
         <PostCreated onClose={() => setShowCreatePost(false)} />
       )}
+    </div>
+  );
+}
+
+// Instagram Video Player Component
+function InstagramVideoPlayer({ videoUrl, postId }) {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [showHeart, setShowHeart] = useState(false);
+  const [showPlayPause, setShowPlayPause] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const lastTapRef = useRef(0);
+
+  const togglePlayPause = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+      setShowPlayPause(true);
+      setTimeout(() => setShowPlayPause(false), 500);
+    }
+  };
+
+  const toggleMute = (e) => {
+    e.stopPropagation();
+    setIsMuted(!isMuted);
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+    }
+  };
+
+  const handleTap = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+      handleDoubleTap();
+    } else {
+      setTimeout(() => {
+        if (Date.now() - lastTapRef.current >= DOUBLE_TAP_DELAY) {
+          togglePlayPause();
+        }
+      }, DOUBLE_TAP_DELAY);
+    }
+
+    lastTapRef.current = now;
+  };
+
+  const handleDoubleTap = () => {
+    setShowHeart(true);
+    setIsLiked(true);
+    setTimeout(() => setShowHeart(false), 1000);
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            videoRef.current?.play();
+            setIsPlaying(true);
+          } else {
+            videoRef.current?.pause();
+            setIsPlaying(false);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    if (videoRef.current) {
+      observer.observe(videoRef.current);
+    }
+
+    return () => {
+      if (videoRef.current) {
+        observer.unobserve(videoRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="relative w-full aspect-video bg-black">
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        className="w-full h-full object-cover"
+        loop
+        playsInline
+        muted={isMuted}
+        onClick={handleTap}
+      />
+
+      {/* Mute/Unmute Button */}
+      <button
+        onClick={toggleMute}
+        className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full z-10 hover:bg-opacity-70 transition"
+      >
+        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+      </button>
+
+      {/* Play/Pause Icon */}
+      {showPlayPause && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="bg-black bg-opacity-50 p-4 rounded-full animate-ping">
+            {isPlaying ? (
+              <Pause size={40} className="text-white" />
+            ) : (
+              <Play size={40} className="text-white" />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Heart Animation */}
+      {showHeart && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <Heart
+            size={100}
+            className="text-white animate-bounce"
+            fill="red"
+            strokeWidth={0}
+          />
+        </div>
+      )}
+
+      {/* Play Overlay */}
+      {!isPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-black bg-opacity-30 p-4 rounded-full">
+            <Play size={50} className="text-white" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Post Card Component
+function PostCard({ post }) {
+  const [like, setLike] = useState(false);
+
+  return (
+    <div className="border border-gray-300 dark:border-gray-800 rounded-md mb-6">
+      {/* Post Header */}
+      <div className="flex items-center justify-between p-3">
+        <div className="flex items-center gap-3">
+          <img
+            src={ `https://i.pravatar.cc/40`}
+            className="w-8 h-8 rounded-full"
+            alt="user"
+          />
+          <span className="font-bold text-sm text-gray-950 dark:text-white">
+            _{post.userDetails?.userName || "user_name"}
+          </span>
+        </div>
+        <MoreHorizontal className="cursor-pointer" />
+      </div>
+
+      {/* Post Media */}
+      {post.postType === "image" ? (
+        <img
+          src={post.mediaUrl.url}
+          className="w-full object-cover"
+          alt="post"
+        />
+      ) : (
+        <InstagramVideoPlayer videoUrl={post.mediaUrl.url} postId={post._id} />
+      )}
+
+      {/* Actions */}
+      <div className="flex justify-between px-4 py-3">
+        <div className="flex gap-3">
+          <Heart
+            onClick={() => setLike(!like)}
+            className={`cursor-pointer transition ${
+              like ? "text-red-500" : "text-gray-700 dark:text-gray-300"
+            }`}
+            fill={like ? "red" : "none"}
+          />
+          <MessageCircle className="cursor-pointer text-gray-700 dark:text-gray-300" />
+        </div>
+        <Bookmark className="cursor-pointer text-gray-700 dark:text-gray-300" />
+      </div>
+
+      <p className="text-sm px-4 font-semibold">
+        {post.likes || 0} likes
+      </p>
+      <p className="px-4 text-sm mt-1">
+        <span className="font-semibold mr-1">
+          {post.userDetails?.username || "user_name"}
+        </span>
+        {post.description || "No caption"}
+      </p>
+
+      {/* Comment Input */}
+      <div className="border-t border-gray-300 dark:border-gray-800 mt-3 p-3">
+        <input
+          placeholder="Add a comment..."
+          className="w-full bg-transparent outline-none text-sm"
+        />
+      </div>
     </div>
   );
 }
@@ -186,10 +317,10 @@ function Sidebar({ setShowCreatePost }) {
     { icon: <Compass />, text: "Explore", onClick: () => console.log("Explore") },
     { icon: <MessageCircle />, text: "Messages", onClick: () => console.log("Messages") },
     { icon: <Heart />, text: "Notifications", onClick: () => console.log("Notifications") },
-    { 
-      icon: <PlusSquare />, 
-      text: "Create", 
-      onClick: () => setShowCreatePost(true)
+    {
+      icon: <PlusSquare />,
+      text: "Create",
+      onClick: () => setShowCreatePost(true),
     },
   ];
 
@@ -201,11 +332,11 @@ function Sidebar({ setShowCreatePost }) {
 
       <div className="flex flex-col gap-3">
         {menuItems.map((item, i) => (
-          <SidebarItem 
-            icon={item.icon} 
-            text={item.text} 
-            onClick={item.onClick} 
-            key={i} 
+          <SidebarItem
+            icon={item.icon}
+            text={item.text}
+            onClick={item.onClick}
+            key={i}
           />
         ))}
         <SidebarItem
@@ -226,7 +357,7 @@ function Sidebar({ setShowCreatePost }) {
 
 function SidebarItem({ icon, text, onClick }) {
   return (
-    <div 
+    <div
       className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
       onClick={onClick}
     >
@@ -239,7 +370,6 @@ function SidebarItem({ icon, text, onClick }) {
 function RightSidebar() {
   return (
     <div className="hidden lg:flex flex-col w-80 p-4 sticky top-0 h-screen">
-      {/* ******Profile ****** */}
       <div className="flex items-center gap-3">
         <img
           src="https://i.pravatar.cc/50"
@@ -282,11 +412,11 @@ function RightSidebar() {
 
 function BottomNavbar({ setShowCreatePost }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-2 bg-white dark:bg-gray-700 text-black dark:text-gray-300 border-t border-gray-300 flex justify-around md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 p-2 bg-white dark:bg-gray-700 text-black dark:text-gray-300 border-t border-gray-300 flex justify-around md:hidden z-50">
       <Home className="cursor-pointer" />
       <Search className="cursor-pointer" />
-      <PlusSquare 
-        className="cursor-pointer" 
+      <PlusSquare
+        className="cursor-pointer"
         onClick={() => setShowCreatePost(true)}
       />
       <Heart className="cursor-pointer" />

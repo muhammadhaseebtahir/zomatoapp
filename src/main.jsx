@@ -4,12 +4,16 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import AuthContextProvider from './context/authContext.jsx'
+import GetFoodContext from './context/getFoodContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
     <AuthContextProvider>
+      <GetFoodContext>
+
     <App />
+      </GetFoodContext>
     </AuthContextProvider>
     </BrowserRouter>
   </StrictMode>,

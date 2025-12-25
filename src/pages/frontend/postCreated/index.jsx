@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Button, message } from "antd";
 import { X } from "lucide-react";
 import axios from "axios";
+import { useAuthContext } from "../../../context/authContext";
 export default function PostCreated({onClose}) {
+  const {isAuthenticated} = useAuthContext()
   const [file, setFile] = useState(null);
   const [type, setType] = useState(null);
   const [caption, setCaption] = useState("");
@@ -19,6 +21,9 @@ export default function PostCreated({onClose}) {
   };
 
   const handleSubmit = async () => {
+    if(!isAuthenticated) {
+      return message.info("Please login first.")
+    }
     // Validation
     if (!file) {
       return message.info("Please select your image or video.");
@@ -118,7 +123,7 @@ onClose();
           ) : (
             <>
               {type === "image" ? (
-                <img src={preview} className="rounded-md w-full h-80" />
+                <img src={preview} className="rounded-md w-full h-80 object-cover" />
               ) : (
                 <video
                   src={preview}
@@ -139,7 +144,7 @@ onClose();
                 loading={isLoading}
                 className="w-full py-2 rounded-md"
               >
-                Share
+                Post
               </Button>
             </>
           )}
